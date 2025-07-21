@@ -915,8 +915,6 @@ Be thorough and methodical. Always verify you have the correct post by its posit
 
   // Track conversation state
   const assistantContent: Array<{ type: string; [key: string]: unknown }> = [];
-  let thinkingCount = 0;
-  let toolCallCount = 0;
   let currentMessages = [...messages];
   let finalResponse = '';
 
@@ -924,21 +922,13 @@ Be thorough and methodical. Always verify you have the correct post by its posit
   async function processResponse(resp: { content: Array<{ type: string; thinking?: string; text?: string; name?: string; input?: Record<string, unknown>; id?: string }> }) {
     for (const block of resp.content) {
       if (block.type === 'thinking') {
-        thinkingCount++;
-        const thinkingContent = block.thinking || '';
         assistantContent.push(block);
       } else if (block.type === 'tool_use') {
-        toolCallCount++;
-        const toolDisplayName = block.name === 'web_search' ? 'firecrawl_search' : 
-                                 block.name === 'deep_scrape' ? 'firecrawl_scrape' : 
-                                 block.name;
         // Executing tool
         assistantContent.push(block);
 
         // Execute the tool
-        const startTime = Date.now();
         const toolResult = await executeTool(block.name || '', block.input || {});
-        const duration = Date.now() - startTime;
         
         // Tool execution completed
 

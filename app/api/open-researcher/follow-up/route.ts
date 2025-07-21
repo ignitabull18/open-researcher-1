@@ -64,6 +64,7 @@ Only return the JSON array, nothing else.`
       return NextResponse.json({ questions: [] })
     }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Error generating follow-up questions
     return NextResponse.json(

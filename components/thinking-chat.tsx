@@ -223,6 +223,7 @@ export function ThinkingChat({ onMessagesChange, hasFirecrawlKey = false, onApiK
                     : msg
                 ))
               }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (e) {
               // Error parsing SSE data
             }

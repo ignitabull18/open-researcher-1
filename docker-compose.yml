@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  open-researcher:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      # Add your actual API keys here for local testing
+      # - ANTHROPIC_API_KEY=your_key_here
+      # - FIRECRAWL_API_KEY=your_key_here
+    env_file:
+      - .env.local  # Create this file with your actual API keys for local testing
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/check-env"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 

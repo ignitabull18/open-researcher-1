@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const environmentStatus = {
-    FIRECRAWL_API_KEY: !!process.env.FIRECRAWL_API_KEY,
+  const checks = {
     ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
-    FIRESTARTER_DISABLE_CREATION_DASHBOARD: process.env.FIRESTARTER_DISABLE_CREATION_DASHBOARD === 'true',
+    FIRECRAWL_API_KEY: !!process.env.FIRECRAWL_API_KEY,
+    NODE_ENV: process.env.NODE_ENV,
+    firecrawlKeyFormat: process.env.FIRECRAWL_API_KEY?.startsWith('fc-') || false,
+    ssrSafe: typeof window === 'undefined', // Should always be true on server
   };
 
-  // Add debug info (only in development)
-  const debugInfo = process.env.NODE_ENV === 'development' ? {
-    anthropicKeyPrefix: process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.substring(0, 10) + '...' : 'NOT SET',
-    firecrawlKeyPrefix: process.env.FIRECRAWL_API_KEY ? process.env.FIRECRAWL_API_KEY.substring(0, 10) + '...' : 'NOT SET',
-    nodeEnv: process.env.NODE_ENV
-  } : {};
+  const allGood = checks.ANTHROPIC_API_KEY && 
+                  checks.FIRECRAWL_API_KEY && 
+                  checks.firecrawlKeyFormat &&
+                  checks.ssrSafe;
 
-  return NextResponse.json({ 
-    environmentStatus,
-    ...debugInfo
+  return NextResponse.json({
+    status: allGood ? 'ready' : 'configuration_error',
+    checks,
+    message: allGood 
+      ? 'All environment variables are configured correctly'
+      : 'Some environment variables are missing or misconfigured'
   });
 } 

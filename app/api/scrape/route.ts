@@ -53,7 +53,27 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     // Error in /api/scrape endpoint (SDK)
     const err = error as ApiError;
+    console.error('Firecrawl API error:', err);
+    
+    // Handle specific Firecrawl API errors
+    if (err.message?.includes('Rate limit')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Rate limit exceeded. Please try again in a moment.' 
+      }, { status: 429 });
+    }
+    
+    if (err.message?.includes('API key')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'API configuration error. Please contact support.' 
+      }, { status: 401 });
+    }
+    
     const errorStatus = typeof err.status === 'number' ? err.status : 500;
-    return NextResponse.json({ success: false, error: 'An error occurred while processing your request. Please try again later.' }, { status: errorStatus });
+    return NextResponse.json({ 
+      success: false, 
+      error: 'An error occurred while processing your request. Please try again later.' 
+    }, { status: errorStatus });
   }
 } 

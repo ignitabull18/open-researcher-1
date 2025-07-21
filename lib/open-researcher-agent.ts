@@ -20,6 +20,11 @@ function getAnthropicClient(): Anthropic {
 
 function getFirecrawlClient(): FirecrawlApp {
   if (!firecrawl) {
+    // SSR Protection: Ensure we're in a server environment
+    if (typeof window !== 'undefined') {
+      throw new Error('Firecrawl client should only be used on the server side');
+    }
+    
     const apiKey = process.env.FIRECRAWL_API_KEY;
     if (!apiKey) {
       // FIRECRAWL_API_KEY is not set in environment variables
